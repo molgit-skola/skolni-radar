@@ -4,7 +4,11 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
-app.use(cors()); // Povolí doplňku posílat data
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+})); // Povolí doplňku posílat data
 app.use(express.json()); // Aby server uměl číst data
 
 // Zobrazení učitelského panelu
