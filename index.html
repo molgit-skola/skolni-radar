@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="cs">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Třídní Radar - Učitel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f9;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .zak-karta {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .zak-jmeno {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .zak-url {
+            color: #666;
+            font-size: 0.9em;
+            max-width: 50%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Barvy statusu */
+        .status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .ok {
+            background: #4CAF50;
+        }
+
+        /* Zelená - pracuje */
+        .vytrus {
+            background: #F44336;
+        }
+
+        /* Červená - je jinde */
+    </style>
+</head>
+
+<body>
+
+    <h1>📡 Třídní Radar</h1>
+    <div id="seznamZaku">Čekám na připojení žáků...</div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const seznam = document.getElementById('seznamZaku');
+        const zaci = {}; // Zde si budeme pamatovat stav žáků
+
+        // Seznam webů, které považujeme za vyrušování (můžete si libovolně upravit)
+        const zakazaneWeby = ['youtube.com', 'facebook.com', 'poki.com', 'instagram.com', 'tiktok.com'];
+
+        socket.on('aktualizacePanelu', (data) => {
+            if (Object.keys(zaci).length === 0) seznam.innerHTML = ''; // Vymaže text "Čekám na připojení"
+
+            // Logika pro obarvení tečky
+            let jeMimo = zakazaneWeby.some(web => data.url.includes(web));
+            let statusTrida = jeMimo ? 'vytrus' : 'ok';
+            let statusText = jeMimo ? 'Vyrušuje' : 'Pracuje';
+
+            zaci[data.email] = `
+                <div class="zak-karta">
+                    <span class="zak-jmeno">${data.email}</span>
+                    <span class="zak-url">${data.url}</span>
+                    <span class="status ${statusTrida}">${statusText}</span>
+                </div>
+            `;
+
+            // Vykreslení celého seznamu
+            seznam.innerHTML = Object.values(zaci).join('');
+        });
+    </script>
+</body>
+
+</html>
