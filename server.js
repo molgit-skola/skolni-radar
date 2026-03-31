@@ -16,6 +16,9 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/radar.crx', (req, res) => res.sendFile(__dirname + '/radar.crx'));
+app.get('/update.xml', (req, res) => res.sendFile(__dirname + '/update.xml'));
+
 // Příjem dat o tom, kde žák je
 app.post('/api/data', (req, res) => {
     const dataZaka = req.body;
