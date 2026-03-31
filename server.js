@@ -16,8 +16,15 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
-app.get('/radar.crx', (req, res) => res.sendFile(__dirname + '/radar.crx'));
-app.get('/update.xml', (req, res) => res.sendFile(__dirname + '/update.xml'));
+app.get('/radar.crx', (req, res) => {
+    res.setHeader('Content-Type', 'application/x-chrome-extension');
+    res.sendFile(__dirname + '/radar.crx');
+});
+
+app.get('/update.xml', (req, res) => {
+    res.setHeader('Content-Type', 'text/xml');
+    res.sendFile(__dirname + '/update.xml');
+});
 
 // Příjem dat o tom, kde žák je
 app.post('/api/data', (req, res) => {
