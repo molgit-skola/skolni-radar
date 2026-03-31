@@ -6,25 +6,41 @@ const io = require('socket.io')(http, {
     cors: { origin: "*" }
 });
 
-// 1. DVEŘNÍK: Povolí úplně všechny dotazy odkudkoliv (musí být nahoře!)
 app.use(cors());
-
-// 2. PŘEKLADATEL: Aby server uměl číst data od doplňku
 app.use(express.json());
 
-// 3. ZOBRAZENÍ PANELU PRO UČITELE
+// Paměť pro čekající varování
+let cekajiciVarovani = {};
+
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
-// 4. PŘÍJEM DAT OD ŽÁKŮ
+// Příjem dat o tom, kde žák je
 app.post('/api/data', (req, res) => {
     const dataZaka = req.body;
     io.emit('aktualizacePanelu', dataZaka);
     res.sendStatus(200);
 });
 
-// Render nám sám řekne, jaký port máme použít (process.env.PORT)
+// NOVÉ: Učitel klikne na tlačítko a pošle varování
+app.post('/api/poslat-varovani', (req, res) => {
+    const emailZaka = req.body.email;
+    cekajiciVarovani[emailZaka] = true; // Nastavíme past
+    res.sendStatus(200);
+});
+
+// NOVÉ: Doplněk žáka se pravidelně ptá, jestli má dostat vynadáno
+app.get('/api/zkontrolovat-varovani', (req, res) => {
+    const email = req.query.email;
+    if (cekajiciVarovani[email]) {
+        delete cekajiciVarovani[email]; // Smažeme, aby to nevyběhlo 100x
+        res.json({ varovat: true });
+    } else {
+        res.json({ varovat: false });
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 http.listen(PORT, () => {
     console.log(`Server úspěšně běží na portu: ${PORT}`);

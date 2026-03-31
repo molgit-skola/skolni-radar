@@ -40,24 +40,31 @@
             white-space: nowrap;
         }
 
-        /* Barvy statusu */
+        /* Barvy statusu - upraveno i pro tlačítka */
         .status {
             padding: 5px 15px;
             border-radius: 20px;
             color: white;
             font-weight: bold;
+            border: none;
+            font-size: 1em;
         }
 
         .ok {
             background: #4CAF50;
+            display: inline-block;
         }
 
-        /* Zelená - pracuje */
+        /* Červené klikací tlačítko - vyrušuje */
         .vytrus {
             background: #F44336;
+            cursor: pointer;
+            transition: background 0.3s;
         }
 
-        /* Červená - je jinde */
+        .vytrus:hover {
+            background: #d32f2f;
+        }
     </style>
 </head>
 
@@ -72,28 +79,40 @@
         const seznam = document.getElementById('seznamZaku');
         const zaci = {}; // Zde si budeme pamatovat stav žáků
 
-        // Seznam webů, které považujeme za vyrušování (můžete si libovolně upravit)
+        // Seznam webů, které považujeme za vyrušování
         const zakazaneWeby = ['youtube.com', 'facebook.com', 'poki.com', 'instagram.com', 'tiktok.com'];
 
         socket.on('aktualizacePanelu', (data) => {
             if (Object.keys(zaci).length === 0) seznam.innerHTML = ''; // Vymaže text "Čekám na připojení"
 
-            // Logika pro obarvení tečky
             let jeMimo = zakazaneWeby.some(web => data.url.includes(web));
-            let statusTrida = jeMimo ? 'vytrus' : 'ok';
-            let statusText = jeMimo ? 'Vyrušuje' : 'Pracuje';
+
+            // ROZHODNUTÍ: Pokud je mimo, vytvoříme klikací tlačítko. Pokud pracuje, jen zelený text.
+            let statusHtml = jeMimo
+                ? `<button class="status vytrus" onclick="posliVarovani('${data.email}')">Poslat varování!</button>`
+                : `<span class="status ok">Pracuje</span>`;
 
             zaci[data.email] = `
                 <div class="zak-karta">
                     <span class="zak-jmeno">${data.email}</span>
                     <span class="zak-url">${data.url}</span>
-                    <span class="status ${statusTrida}">${statusText}</span>
+                    ${statusHtml}
                 </div>
             `;
 
             // Vykreslení celého seznamu
             seznam.innerHTML = Object.values(zaci).join('');
         });
+
+        // Odeslání povelu na server
+        function posliVarovani(email) {
+            fetch('/api/poslat-varovani', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email })
+            });
+            alert("Varování odesláno žákovi: " + email);
+        }
     </script>
 </body>
 
