@@ -4,197 +4,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Třídní Radar - Učitel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Třídní Radar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --accent: #3b82f6;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --warning-hover: #d97706;
-        }
-
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            background-color: #fafafa;
+            color: #111827;
             margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            padding: 2rem;
         }
 
-        /* Moderní hlavička s přechodem */
+        /* Čistá hlavička s počítadlem */
         header {
-            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-            color: white;
-            width: 100%;
-            padding: 2rem 0;
-            text-align: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 1rem;
             margin-bottom: 2rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
             margin: 0;
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.025em;
         }
 
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            padding: 0 20px;
-            box-sizing: border-box;
+        .counter {
+            font-size: 0.875rem;
+            color: #6b7280;
         }
 
-        #seznamZaku {
-            display: flex;
-            flex-direction: column;
+        /* Kontejner pro přesně 16 studentů (mřížka) */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        /* Animovaný text při čekání */
-        .empty-state {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 1.2rem;
-            margin-top: 3rem;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                opacity: 0.6;
-            }
-
-            50% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 0.6;
-            }
-        }
-
-        /* Kartička žáka */
+        /* Minimalistická kartička */
         .zak-karta {
-            background: var(--card-bg);
-            padding: 1.2rem 1.5rem;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            background: #ffffff;
             border: 1px solid #e5e7eb;
-        }
-
-        .zak-karta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        .student-info {
+            border-radius: 6px;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
-            flex: 1;
-            min-width: 0;
-            /* aby fungovalo useknutí dlouhého textu */
+            justify-content: space-between;
+            transition: border-color 0.2s;
+        }
+
+        /* Když žák vyrušuje, kartička získá jen jemný červený obrys */
+        .zak-karta.vytrus {
+            border-color: #f87171;
+            background-color: #fef2f2;
+        }
+
+        /* Hlavička kartičky s tečkou stavu */
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        .status-dot.ok {
+            background-color: #10b981;
+        }
+
+        .status-dot.vytrus {
+            background-color: #ef4444;
         }
 
         .zak-jmeno {
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: var(--text-main);
-            margin-bottom: 4px;
-        }
-
-        .zak-url {
-            color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.875rem;
+            font-weight: 500;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .zak-url {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-left: 16px;
+            /* Zarovnání pod text jména */
         }
 
-        /* Štítky stavu */
-        .status {
-            padding: 6px 16px;
-            border-radius: 9999px;
-            color: white;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .ok {
-            background-color: var(--success);
-        }
-
-        .vytrus {
-            background-color: var(--danger);
-            animation: blink 2s infinite;
-        }
-
-        @keyframes blink {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.7;
-            }
-        }
-
-        /* Vylepšené tlačítko Varovat */
+        /* Čisté "ghost" tlačítko */
         .btn-varovat {
-            background-color: var(--warning);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
+            background: transparent;
+            border: 1px solid #d1d5db;
+            color: #374151;
+            padding: 0.35rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
+            text-align: center;
             transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
-            min-width: 120px;
-            justify-content: center;
+            width: 100%;
         }
 
         .btn-varovat:hover {
-            background-color: var(--warning-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(245, 158, 11, 0.4);
+            background: #f3f4f6;
         }
 
-        .btn-varovat:active {
-            transform: translateY(0);
+        /* Tlačítko zčervená jen tehdy, když žák vyrušuje */
+        .zak-karta.vytrus .btn-varovat {
+            border-color: #fca5a5;
+            color: #991b1b;
+            background: #fee2e2;
+        }
+
+        .zak-karta.vytrus .btn-varovat:hover {
+            background: #fecaca;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.875rem;
+            padding: 2rem;
         }
     </style>
 </head>
@@ -202,22 +152,19 @@
 <body>
 
     <header>
-        <h1>📡 Třídní Radar</h1>
-        <p style="margin-top: 5px; opacity: 0.9;">Přehled o aktivitě studentů v reálném čase</p>
+        <h1>Třídní Radar</h1>
+        <div class="counter" id="pocetZaku">Připojeno: 0</div>
     </header>
 
-    <div class="container">
-        <div id="seznamZaku">
-            <div class="empty-state">
-                ⏳ Čekám na připojení žáků...
-            </div>
-        </div>
+    <div class="grid-container" id="seznamZaku">
+        <div class="empty-state">Čekám na připojení žáků...</div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
         const seznam = document.getElementById('seznamZaku');
+        const pocetElement = document.getElementById('pocetZaku');
         const zaci = {};
 
         const zakazaneWeby = ['youtube.com', 'facebook.com', 'poki.com', 'instagram.com', 'tiktok.com'];
@@ -227,27 +174,26 @@
 
             let jeMimo = zakazaneWeby.some(web => data.url.includes(web));
             let statusTrida = jeMimo ? 'vytrus' : 'ok';
-            let statusText = jeMimo ? '⚠️ Vyrušuje' : '✅ Pracuje';
 
             zaci[data.email] = `
-                <div class="zak-karta">
-                    <div class="student-info">
-                        <span class="zak-jmeno">${data.email}</span>
-                        <span class="zak-url">${data.url}</span>
+                <div class="zak-karta ${statusTrida}">
+                    <div>
+                        <div class="card-header">
+                            <span class="status-dot ${statusTrida}"></span>
+                            <span class="zak-jmeno">${data.email}</span>
+                        </div>
+                        <div class="zak-url" title="${data.url}">${data.url}</div>
                     </div>
-                    <div class="controls">
-                        <span class="status ${statusTrida}">${statusText}</span>
-                        <button class="btn-varovat" onclick="posliVarovani(event, '${data.email}')">
-                            <span>🔔</span> Varovat
-                        </button>
-                    </div>
+                    <button class="btn-varovat" onclick="posliVarovani(event, '${data.email}')">
+                        Varovat
+                    </button>
                 </div>
             `;
 
             seznam.innerHTML = Object.values(zaci).join('');
+            pocetElement.innerText = `Připojeno: ${Object.keys(zaci).length}`;
         });
 
-        // Moderní odeslání bez vyskakovacího alert okna
         function posliVarovani(event, email) {
             fetch('/api/poslat-varovani', {
                 method: 'POST',
@@ -255,18 +201,17 @@
                 body: JSON.stringify({ email: email })
             });
 
-            // Animace tlačítka pro potvrzení (zezelená a změní text)
             let btn = event.currentTarget;
             let originalText = btn.innerHTML;
-            let originalColor = btn.style.backgroundColor;
 
-            btn.innerHTML = '✔️ Odesláno';
-            btn.style.backgroundColor = '#10b981'; // Zelená
+            btn.innerHTML = 'Odesláno ✓';
+            btn.style.borderColor = '#10b981';
+            btn.style.color = '#10b981';
+            btn.style.background = 'transparent';
 
-            // Po 2 vteřinách se vrátí zpět
             setTimeout(() => {
                 btn.innerHTML = originalText;
-                btn.style.backgroundColor = originalColor;
+                btn.style = ''; // Vrátí styly do původního stavu
             }, 2000);
         }
     </script>
